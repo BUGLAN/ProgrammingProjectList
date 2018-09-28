@@ -12,20 +12,24 @@
 import sys
 from pathlib import Path
 
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QFontMetricsF
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFontDialog,
-                             QMainWindow, QMenu, QTextEdit, qApp)
+                             QMainWindow, QMenu, qApp,
+                             QPlainTextEdit)
 
 
 class Editor(QMainWindow):
-
     def __init__(self):
         super().__init__()
+        self.currentpath = ''
         self.font = QFont("Monaco", 14)
         self.font.setFixedPitch(True)
         self.title = 'simple text editor'
-        self.textEditor = QTextEdit()
+        self.textEditor = QPlainTextEdit()
         self.textEditor.setFont(self.font)
+        self.textEditor.setTabStopDistance(
+            QFontMetricsF(self.textEditor.font()).width(' ') * 4)
+        # set tab length 4 spaces
         self.menubar = self.menuBar()
         self.menubar.setFont(self.font)
         self.init_ui()
@@ -39,11 +43,19 @@ class Editor(QMainWindow):
         newAct = QAction('New', self)
         openAct = QAction('Open', self)
         autoSave = QAction('AutoSavle', self, checkable=True)
-        settingAct = QAction('Setting', self)
         exitAct = QAction('Exit', self)
+        saveAct = QAction('Save', self)
+        exitAct.triggered.connect(qApp.quit)
+
+        newAct.setShortcut('Ctrl+N')
+        openAct.setShortcut('Ctrl+O')
+        exitAct.setShortcut('Ctrl+Q')
+        saveAct.setShortcut('Ctrl+S')
 
         # action detail
-        openAct.triggered.connect(self.showFileDialog)
+        openAct.triggered.connect(self.openFile)
+        newAct.triggered.connect(self.newFile)
+        saveAct.triggered.connect(self.saveFile)
 
         # autoSave set default False
         autoSave.setChecked(False)
@@ -51,9 +63,24 @@ class Editor(QMainWindow):
         # add action on fileMenu
         fileMenu.addAction(newAct)
         fileMenu.addAction(openAct)
+        fileMenu.addAction(saveAct)
         fileMenu.addAction(autoSave)
-        fileMenu.addAction(settingAct)
         fileMenu.addAction(exitAct)
+
+    def newFile(self):
+        fname = QFileDialog.getSaveFileName(self, 'Save file')
+        context = self.textEditor.toPlainText()
+        if fname[0]:
+            with open(fname[0], 'w') as f:
+                f.write(context)
+            self.currentpath = fname[0]
+
+    def saveFile(self):
+        path = self.currentpath
+        context = self.textEditor.toPlainText()
+        if path:
+            with open(path, 'w') as f:
+                f.write(context)
 
     def setSettingMenu(self):
         # settingMenu setting
@@ -67,16 +94,13 @@ class Editor(QMainWindow):
         settingMenu.addAction(fontAct)
 
         # add action on settingMenu
-        fontAct.triggered.connect(self.showFontDialog)
+        fontAct.triggered.connect(self.selectFont)
 
-    def showFontDialog(self):
+    def selectFont(self):
         font, ok = QFontDialog.getFont()
 
         if ok:
-            #  QApplication.setFont(font)
-            print(self.textEditor.font)
-            self.font = font
-            print("Display Fonts: ", font)
+            self.textEditor.setFont(font)
 
     def init_ui(self):
         self.setFileMenu()
@@ -105,15 +129,15 @@ class Editor(QMainWindow):
         if action == openAct:
             pass
 
-    def showFileDialog(self):
+    def openFile(self):
         # get current use main home full path as string
         main_home = Path.home().absolute().as_posix()
         fname = QFileDialog.getOpenFileName(self, 'Open File', main_home)
         if fname[0]:
-            f = open(fname[0], 'r')
-            with f:
+            with open(fname[0], 'r') as f:
                 content = f.read()
-                self.textEditor.setText(content)
+                self.textEditor.setPlainText(content)
+                self.currentpath = fname[0]
 
 
 if __name__ == "__main__":
