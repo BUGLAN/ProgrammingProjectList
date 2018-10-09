@@ -14,11 +14,11 @@ from pathlib import Path
 
 from PyQt5.QtGui import QFont, QFontMetricsF
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFontDialog,
-                             QMainWindow, QMenu, qApp,
-                             QPlainTextEdit)
+                             QMainWindow, QMenu, qApp, QPlainTextEdit)
 
 
 class Editor(QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.currentpath = ''
@@ -27,9 +27,9 @@ class Editor(QMainWindow):
         self.title = 'simple text editor'
         self.textEditor = QPlainTextEdit()
         self.textEditor.setFont(self.font)
+        # set tab length 4 spaces
         self.textEditor.setTabStopDistance(
             QFontMetricsF(self.textEditor.font()).width(' ') * 4)
-        # set tab length 4 spaces
         self.menubar = self.menuBar()
         self.menubar.setFont(self.font)
         self.init_ui()
