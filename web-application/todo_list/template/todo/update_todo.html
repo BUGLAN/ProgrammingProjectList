@@ -1,0 +1,15 @@
+{%extends 'base.html'%}
+
+{%block title%}修改 | todo 小网站{%endblock%}
+
+{%block body%}
+<div class="container">
+    <div class="starter-template">
+        <form action="{{url_for('update_todo')}}" method="post">
+            <input type="hidden" name="id" value="{{request.args.get('id')}}" />
+            <input type="text" name="title" />
+            <input type="submit" />
+        </form>
+    </div>
+</div>
+{%endblock%}
