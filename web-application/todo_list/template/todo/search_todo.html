@@ -4,11 +4,14 @@
 
 {%block body%}
 <div class="container">
-    <div class="starter-template">
-        <form action="{{url_for('search_todo')}}" method="post">
-            <input type="text" name="title" />
-            <input type="submit" />
-        </form>
-    </div>
+    <h1 class="text-success text-center">Search Todo</h1>
+    <br>
+    <form action="{{url_for('search_todo')}}" method="post">
+        <div class="form-group">
+            <label for="email">标题:</label>
+            <input type="text" class="form-control" name="title">
+        </div>
+        <input type="submit" class="btn btn-primary" value="Submit">
+    </form>
 </div>
 {%endblock%}

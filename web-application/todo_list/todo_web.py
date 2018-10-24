@@ -106,6 +106,7 @@ def search_todo():
         return render_template('todo/search_todo.html')
     elif request.method == 'POST':
         title = request.form.get('title')
+        print(title)
         todos = Todo.query.filter(Todo.title.like('%' + title + '%')).all()
         time = datetime.now()
         return render_template('todo/index.html', todos=todos, time=time)
