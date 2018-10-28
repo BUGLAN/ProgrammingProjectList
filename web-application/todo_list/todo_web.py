@@ -42,7 +42,7 @@ def before_first_do():
 
 @app.route('/')
 def index():
-    todos = Todo.query.all()
+    todos = Todo.query.order_by(db.desc(Todo.status)).all()
     time = datetime.now()
     return render_template('todo/index.html', time=time, todos=todos)
 
@@ -54,6 +54,12 @@ def add_todo():
     elif request.method == 'POST':
         title = request.form.get('title')
         todo = Todo(title=title)
+        # 2018-10-28 11:00:00
+        todo.created_time = datetime.strptime(
+            request.form.get('created_time', None), '%Y-%m-%d %H:%M:%S')
+        todo.finished_time = datetime.strptime(
+            request.form.get('finished_time', None), '%Y-%m-%d %H:%M:%S')
+        todo.status = False
         db.session.add(todo)
         db.session.commit()
         return redirect(url_for('index'))
@@ -87,12 +93,19 @@ def delete_todo():
 @app.route('/update_todo', methods=['GET', 'POST'])
 def update_todo():
     if request.method == 'GET':
-        return render_template('todo/update_todo.html')
+        id = request.args.get('id', None)
+        if id:
+            todo = Todo.query.get_or_404(id)
+            return render_template('todo/update_todo.html', todo=todo)
     elif request.method == 'POST':
         id = request.form.get('id')
         title = request.form.get('title')
         todo = Todo.query.get_or_404(id)
         todo.title = title
+        todo.created_time = datetime.strptime(
+            request.form.get('created_time', None), '%Y-%m-%d %H:%M:%S')
+        todo.finished_time = datetime.strptime(
+            request.form.get('finished_time', None), '%Y-%m-%d %H:%M:%S')
         db.session.add(todo)
         db.session.commit()
         return redirect(url_for('index'))
