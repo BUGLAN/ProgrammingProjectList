@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask, abort, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__, template_folder='./template', static_folder='./static')
+app = Flask(__name__, template_folder='./templates', static_folder='./static')
 
 # config sqlite config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
@@ -130,7 +130,3 @@ def search_todo():
 @app.route('/test')
 def test():
     return render_template('todo/test.html')
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
