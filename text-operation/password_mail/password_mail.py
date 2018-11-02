@@ -1,8 +1,14 @@
 import base64
 
 from flask import Flask, abort, render_template, request
+from flask_wtf import Form
+from typing import Optional
 
 app = Flask(__name__)
+
+
+class MyForm(Form):
+    pass
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -22,13 +28,13 @@ def index():
     abort(404)
 
 
-
 def send_email(to, message):
     import smtplib
     from email.mime.text import MIMEText
     from email.header import Header
     _user = "1831353087@qq.com"
-    _pwd = "jmdqkdndaeqtcagh"  # 需要的密码是相关设置中开启IMAP/SMTP 的授权码
+    _pwd = "******"  # 需要的密码是相关设置中开启IMAP/SMTP 的授权码
+    # _pwd是授权码
     _to = to
 
     # 使用MIMEText构造符合smtp协议的header及body
