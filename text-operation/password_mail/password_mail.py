@@ -1,31 +1,32 @@
 import base64
+import os
 
-from flask import Flask, abort, render_template, request
-from flask_wtf import Form
-from typing import Optional
+from flask import Flask, render_template, request, current_app
+from wtforms import TextAreaField, StringField, Form
+from wtforms.validators import DataRequired, Email
 
 app = Flask(__name__)
+app.config['code'] = 'jmdqkdndaeqtcagh'
+app.config['SECRET_KEY'] = 'YOU-NEVER-GUESS-THE-SECRET-KEY'
 
 
 class MyForm(Form):
-    pass
+    message = TextAreaField('message', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired(), Email()])
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    form = MyForm(request.form)
     if request.method == 'GET':
-        return render_template('index.html')
-    elif request.method == 'POST':
-        message = request.form.get('message', None)
-        email = request.form.get('email', None)
-        if message and email:
-            encrypt_message = base64.b64encode(message.encode())
-            # 846478339@qq.com
-            send_email(email, encrypt_message.decode())
-            return "something is ok"
-        # do something
-        return "something is error"
-    abort(404)
+        return render_template('index.html', form=form)
+    elif request.method == 'POST' and form.validate():
+        message = form.message.data
+        email = form.email.data
+        encrypt_message = base64.b64encode(message.encode())
+        send_email(email, encrypt_message.decode())
+        return 'something is ok'
+    return 'something is error'
 
 
 def send_email(to, message):
@@ -33,8 +34,8 @@ def send_email(to, message):
     from email.mime.text import MIMEText
     from email.header import Header
     _user = "1831353087@qq.com"
-    _pwd = "******"  # 需要的密码是相关设置中开启IMAP/SMTP 的授权码
-    # _pwd是授权码
+    # 需要的密码是相关设置中开启IMAP/SMTP 的授权码 _pwd是授权码
+    _pwd = os.environ.get('code', None) or current_app.config.get('code', None)
     _to = to
 
     # 使用MIMEText构造符合smtp协议的header及body
