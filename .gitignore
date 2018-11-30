@@ -1,4 +1,11 @@
+# python
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
+
+# visual stdio code
+.vscode/
+
+# pycharm
+.idea/
